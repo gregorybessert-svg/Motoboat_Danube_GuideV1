@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import "./styles.css";
 
 // Ursprüngliche Datenquelle verwenden
-import donauData from "./donauData";
+//import donauData from "./donauData";
+import { donauData2 as donauData } from "./donauData2";
 
 const mockData = donauData;
 
