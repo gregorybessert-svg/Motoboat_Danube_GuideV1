@@ -1,28 +1,11 @@
 import React, { useState } from "react";
 import "./styles.css";
 
+// Ursprüngliche Datenquelle verwenden
 import donauData from "./donauData";
 
 const mockData = donauData;
 
-/* ab da kann gesamte dagteninhalt im Kommentar gelöscht werden.
-  const mockData = [
-  { km: "2588.6", rechts: "", links: "Illermündung", dist: -420.8 },
-  { km: "2588.5", rechts: "", links: "Ehem. Km Null", dist: -420.7 },
-  { km: "2586.3", rechts: "Ulmer Ruderclub", links: "", dist: -418.5 },
-  { km: "949.8", rechts: "Eisernes Tor", links: "", dist: 1218.0 },
-  { km: "0.0", rechts: "Sulina", links: "", dist: 2167.8 },
-]; */
-
-/* neu ! hier werden koordinaten importiert */
-import rawData from "./DONAUKILOMETER2OGD.json";
-import { donauPoints } from "./data/donauPoints";
-
-console.log("Erster Punkt:", donauPoints[0]);
-
-// Beispiel: Nur Punkte mit km > 1
-const filtered = donauPoints.filter((p) => p.km > 1);
-/* ab da hat alles funktioniert */
 export default function App() {
   const [search, setSearch] = useState("");
   const [result, setResult] = useState<typeof mockData>([]);
@@ -32,7 +15,7 @@ export default function App() {
 
     const found = mockData.filter(
       (entry) =>
-        entry.km.toLowerCase().includes(query) ||
+        entry.km.toString().includes(query) ||
         (entry.rechts && entry.rechts.toLowerCase().includes(query)) ||
         (entry.links && entry.links.toLowerCase().includes(query))
     );
@@ -65,7 +48,8 @@ export default function App() {
               <br />
               <strong>Linkes Ufer:</strong> {r.links || "–"}
               <br />
-              <strong>Entfernung zu Untermühl:</strong> {r.dist} km
+              <strong>Entfernung zu Untermühl:</strong>{" "}
+              {r.dist?.toFixed(1) || "–"} km
             </div>
           ))}
         </div>
