@@ -1,0 +1,47 @@
+.App {
+  font-family: sans-serif;
+  padding: 2rem;
+  max-width: 600px;
+  margin: auto;
+}
+input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+button {
+  padding: 0.5rem 1rem;
+  background: #0070f3;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 5px;
+}
+.results {
+  margin-top: 1rem;
+}
+.entry {
+  border-top: 1px solid #ccc;
+  padding: 0.5rem 0;
+}
+.suggestions {
+  border: 1px solid #ccc;
+  background: #fff;
+  max-height: 150px;
+  overflow-y: auto;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+.suggestions li {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.suggestions li:hover {
+  background: #e0e0e0;
+}
