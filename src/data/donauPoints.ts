@@ -1,6 +1,5 @@
 // src/data/donauPoints.ts
 import rawData from "./DONAUKILOMETER2OGD.json";
-
 export type DonauPoint = {
   km: number;
   dist: number;
@@ -9,6 +8,15 @@ export type DonauPoint = {
   coordinates: [number, number];
   abschnitt: number;
 };
+/* löschen !!
+export type DonauPoint = {
+  km: number;
+  dist: number;
+  rechts: string;
+  links: string;
+  coordinates: [number, number];
+  abschnitt: number;
+};*/
 
 export const donauPoints: DonauPoint[] = rawData.features.map(
   (feature: any) => ({
