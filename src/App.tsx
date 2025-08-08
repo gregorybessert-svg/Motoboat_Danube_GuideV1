@@ -1,16 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./styles.css";
 import { donauData2 as donauData } from "./donauData2";
+import WelcomePage from "./WelcomePage";
+import ThemeSelector from "./ThemeSelector";
 
+// 🔧 Normalisieren (Diakritika entfernen, lowercase)
 const normalize = (str: string) =>
   str
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase();
 
+// 🔢 KM/Distanz-Format: 1 Nachkommastelle, Komma statt Punkt (z. B. 1567,5)
+const formatNumber = (n: number | string) => {
+  if (n === null || n === undefined) return "–";
+  const num = typeof n === "string" ? Number(n) : n;
+  if (Number.isNaN(num)) return "–";
+  return num.toFixed(1).replace(".", ",");
+};
+
 type DonauPoint = (typeof donauData)[number];
 
 export default function App() {
+  // Welcome
+  const [showWelcome, setShowWelcome] = useState(true);
+
+  // Theme
+  const [theme, setTheme] = useState("dark");
+
+  // Suche/Filter
   const [search, setSearch] = useState("");
   const [kmMin, setKmMin] = useState(0);
   const [kmMax, setKmMax] = useState(3000);
@@ -20,16 +38,34 @@ export default function App() {
   const [sortBy, setSortBy] = useState("km");
   const [result, setResult] = useState<DonauPoint[]>([]);
 
+  // Init
+  useEffect(() => {
+    const hideWelcomeFlag = localStorage.getItem("hideWelcome");
+    const savedTheme = localStorage.getItem("theme");
+    if (hideWelcomeFlag === "true") setShowWelcome(false);
+    if (savedTheme) setTheme(savedTheme);
+  }, []);
+
+  // Theme anwenden
+  useEffect(() => {
+    document.body.className = "";
+    document.body.classList.add(`theme-${theme}`);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  // Filtern/Sortieren
   const handleSearch = () => {
     const query = normalize(search.trim());
+    const poiFilter = normalize(poiCategory);
 
     const filtered = donauData.filter((entry) => {
       const inKmRange = entry.km >= kmMin && entry.km <= kmMax;
 
+      // Teilwort-Match (case-insensitive) auf beiden Ufern
       const matchesCategory =
         poiCategory === "alle" ||
-        normalize(entry.rechts || "").includes(poiCategory) ||
-        normalize(entry.links || "").includes(poiCategory);
+        normalize(entry.rechts || "").includes(poiFilter) ||
+        normalize(entry.links || "").includes(poiFilter);
 
       const matchesUfer =
         uferFilter === "beide" ||
@@ -62,48 +98,49 @@ export default function App() {
       document
         .getElementById("results")
         ?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
+    }, 80);
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  if (showWelcome) {
+    return <WelcomePage onContinue={() => setShowWelcome(false)} />;
+  }
 
   return (
     <div className="App">
-      <img
-        src="/logo2.png"
-        alt="BE & GREG SAILORS Logo"
-        style={{ height: "40px", marginRight: "10px" }}
-      />
-      {/*<h1 style={{ fontSize: "1.6rem", textAlign: "center" }}>
-        🚤 Donau StromkilometerGuide
-      </h1>{" "}*/}
-      <div className="logo-header">
-        <h1>Stromkilometer-Suche</h1>
-      </div>
+      {/* Kopfbereich an „alte schwarze Version“ angelehnt */}
+      <header className="app-header">
+        <div className="brand">
+          <img src="/logo2.png" alt="BE & GREG SAILORS" className="app-logo" />
+          <h1 className="app-title">Stromkilometer-Suche</h1>
+        </div>
+        <div className="app-actions">
+          <button onClick={() => setShowWelcome(true)}>ℹ️ Info</button>
+          <ThemeSelector theme={theme} setTheme={setTheme} />
+        </div>
+      </header>
 
-      {result.length > 0 && (
-        <button className="scroll-top-button" onClick={scrollToTop}>
-          ⬆️ Zurück zur Suche
-        </button>
-      )}
-      <div className="controls">
-        <input
-          placeholder="Stromkilometer oder Ortsname eingeben"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleSearch();
-          }}
-        />
+      {/* Such- und Filterbedienung */}
+      <section className="controls">
+        <div className="search-row">
+          <input
+            placeholder="Stromkilometer oder Ortsname eingeben"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          />
+          <button className="primary" onClick={handleSearch}>
+            🔍 Suchen
+          </button>
+        </div>
 
-        <button onClick={handleSearch}>🔍 Suchen</button>
         <div className="filters">
           <label>
             KM von:
             <input
               type="number"
+              inputMode="numeric"
               value={kmMin}
               onChange={(e) => setKmMin(Number(e.target.value))}
             />
@@ -112,11 +149,11 @@ export default function App() {
             bis:
             <input
               type="number"
+              inputMode="numeric"
               value={kmMax}
               onChange={(e) => setKmMax(Number(e.target.value))}
             />
           </label>
-
           <label>
             POI-Typ:
             <select
@@ -129,7 +166,6 @@ export default function App() {
               <option value="brücke">Brücke</option>
             </select>
           </label>
-
           <label>
             Ufer:
             <select
@@ -141,7 +177,6 @@ export default function App() {
               <option value="links">Linkes Donauufer</option>
             </select>
           </label>
-
           <label>
             Sortierung:
             <select
@@ -152,7 +187,6 @@ export default function App() {
               <option value="desc">↓ Absteigend</option>
             </select>
           </label>
-
           <label>
             Sortieren nach:
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
@@ -161,32 +195,47 @@ export default function App() {
             </select>
           </label>
         </div>
-      </div>
-      <div id="results">
+      </section>
+
+      {/* Ergebnisse */}
+      <section id="results">
         {result.length > 0 ? (
           <div className="results">
             <h2>📍 {result.length} Ergebnisse</h2>
             {result.map((r, idx) => (
               <div key={idx} className="entry">
-                <strong>KM:</strong> {r.km}
-                <br />
-                <strong>Rechtes Ufer:</strong> {r.rechts || "–"}
-                <br />
-                <strong>Linkes Ufer:</strong> {r.links || "–"}
-                <br />
-                <strong>Entfernung zu Untermühl:</strong>{" "}
-                {typeof r.dist === "number" ? r.dist.toFixed(1) : "–"} km
+                <div className="entry-row">
+                  <span className="entry-label">KM:</span>
+                  <span className="entry-value km">{formatNumber(r.km)}</span>
+                </div>
+                <div className="entry-row">
+                  <span className="entry-label">Rechtes Ufer:</span>
+                  <span className="entry-value">{r.rechts || "–"}</span>
+                </div>
+                <div className="entry-row">
+                  <span className="entry-label">Linkes Ufer:</span>
+                  <span className="entry-value">{r.links || "–"}</span>
+                </div>
+                <div className="entry-row">
+                  <span className="entry-label">Entfernung zu Untermühl:</span>
+                  <span className="entry-value">
+                    {typeof r.dist === "number" ? formatNumber(r.dist) : "–"} km
+                  </span>
+                </div>
               </div>
             ))}
-
-            <div className="to-top">
-              <button onClick={scrollToTop}>🔝 Zurück zur Suche</button>
-            </div>
           </div>
         ) : (
           <p>🔍 Kein Treffer – bitte Suchbegriff oder Filter prüfen.</p>
         )}
-      </div>
+      </section>
+
+      {/* Fixierter „Zurück zur Suche“-Button */}
+      {result.length > 0 && (
+        <button className="scroll-top-button" onClick={scrollToTop}>
+          ⬆️ Zurück zur Suche
+        </button>
+      )}
     </div>
   );
 }

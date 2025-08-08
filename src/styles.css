@@ -1,150 +1,106 @@
-/* Grundlayout */
+/* =====================
+   Global Theme Variables
+   ===================== */
+:root {
+  --bg-color: #121212;
+  --text-color: #f1f1f1;
+  --accent-color: #0070f3;
+  --input-bg: #1e1e1e;
+  --border-color: #333;
+  --card-sep: #333;
+}
+
+body.theme-dark {
+  --bg-color: #121212;
+  --text-color: #f1f1f1;
+  --accent-color: #0070f3;
+  --input-bg: #1e1e1e;
+  --border-color: #333;
+  --card-sep: #333;
+}
+
+body.theme-ocean {
+  --bg-color: #0e3c61;
+  --text-color: #e0f7ff;
+  --accent-color: #00bcd4;
+  --input-bg: #145a8a;
+  --border-color: #0b2f4a;
+  --card-sep: #114a73;
+}
+
+body.theme-sand {
+  --bg-color: #463414;
+  --text-color: #1d825a;
+  --accent-color: #6b482539;
+  --input-bg: #fff8e1;
+  --border-color: #e3d8c6;
+  --card-sep: #e9dfd0;
+}
+
+/* =====================
+     Base/Layout
+     ===================== */
+html,
+body {
+  height: 100%;
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
 .App {
   font-family: sans-serif;
   padding: 1rem;
-  max-width: 600px;
-  margin: auto;
-  background-color: #121212;
-  color: #f1f1f1;
+  max-width: 480px; /* ❗ schmale, zentrierte App wie im Screenshot */
+  margin: 0 auto;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
-input,
-select {
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-  box-sizing: border-box;
-  background-color: #1e1e1e;
-  color: #fff;
-  border: 1px solid #333;
-  border-radius: 5px;
-}
-
-input:focus,
-select:focus {
-  outline: 2px solid #0070f3;
-  background-color: #262626;
-}
-
-button {
-  padding: 0.5rem 1rem;
-  background: #0070f3;
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  border-radius: 5px;
-  transition: background 0.3s, transform 0.1s;
-}
-
-button:hover {
-  background: #0056b3;
-}
-
-button:active {
-  transform: scale(0.97);
-}
-
-/* Ergebnisdarstellung */
-.results {
-  margin-top: 1rem;
-}
-
-.entry {
-  border-top: 1px solid #333;
-  padding: 0.5rem 0;
-}
-
-.to-top {
-  text-align: center;
-  margin-top: 1rem;
-}
-
-/* Vorschlagsliste */
-.suggestions {
-  border: 1px solid #333;
-  background: #1e1e1e;
-  max-height: 150px;
-  overflow-y: auto;
-  margin-top: -0.5rem;
-  margin-bottom: 0.5rem;
-  list-style: none;
-  padding: 0;
-  color: #fff;
-}
-
-.suggestions li {
-  padding: 0.5rem;
-  cursor: pointer;
-}
-
-.suggestions li:hover {
-  background: #2e2e2e;
-}
-
-/* Zurück-zur-Suche Button */
-.scroll-top-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 12px 16px;
-  font-size: 16px;
-  border-radius: 50px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  transition: background 0.3s, transform 0.2s;
-}
-
-.scroll-top-button:hover {
-  background: #0056b3;
-}
-
-.scroll-top-button:active {
-  transform: scale(0.95);
-}
-
-/* Steuer-Container */
-.controls {
+/* Header */
+.app-header {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
-/* Filtergruppen */
-.filters {
-  display: grid;
-  grid-template-columns: 1fr;
+.brand {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
+  min-width: 0;
 }
 
-/* Responsive Anpassung */
-@media (min-width: 500px) {
-  .filters {
-    grid-template-columns: 1fr 1fr;
-  }
+.app-logo {
+  height: 36px;
+  width: auto;
 }
 
 @media (min-width: 768px) {
-  .filters {
-    grid-template-columns: repeat(3, 1fr);
+  .app-logo {
+    height: 44px;
   }
 }
 
-@media (min-width: 1024px) {
-  .filters {
-    grid-template-columns: repeat(4, 1fr);
-  }
+.app-title {
+  font-size: 1.4rem;
+  margin: 0;
+  font-weight: 700;
 }
+
+.app-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Headline block (kept centered) */
 .logo-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   text-align: center;
 }
 
@@ -160,4 +116,144 @@ button:active {
     justify-content: center;
     gap: 1rem;
   }
+}
+
+/* =====================
+     Controls/Inputs
+     ===================== */
+input,
+select {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--accent-color);
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+button {
+  padding: 0.6rem 1rem;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 8px;
+  transition: background 0.3s, transform 0.1s;
+}
+
+button:hover {
+  filter: brightness(0.95);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.primary {
+  background: var(--accent-color);
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.search-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Filter grid (2 Spalten auf Mobile, 3/4 auf größeren Screens) */
+.filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .filters {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .filters {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* =====================
+     Results
+     ===================== */
+.results {
+  margin-top: 1rem;
+}
+
+.entry {
+  border-top: 1px solid var(--card-sep);
+  padding: 0.6rem 0;
+}
+
+.entry-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0.2rem 0;
+}
+
+.entry-label {
+  opacity: 0.9;
+}
+.entry-value.km {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* =====================
+     Scroll-to-top Button
+     ===================== */
+.scroll-top-button {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.scroll-top-button:hover {
+  filter: brightness(0.95);
+}
+
+.scroll-top-button:active {
+  transform: scale(0.96);
+}
+
+/* =====================
+     Misc
+     ===================== */
+.to-top {
+  text-align: center;
+  margin-top: 1rem;
 }
