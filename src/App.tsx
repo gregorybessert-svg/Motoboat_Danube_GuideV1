@@ -21,6 +21,57 @@ const formatNumber = (n: number | string) => {
 
 type DonauPoint = (typeof donauData)[number];
 
+/* 🧩 Chip-Button (ersetzt Select/Option für schnelle Filter) */
+const Chip: React.FC<{
+  selected?: boolean;
+  onClick?: () => void;
+  children: React.ReactNode;
+  title?: string;
+}> = ({ selected, onClick, children, title }) => (
+  <button
+    className={`chip ${selected ? "chip--selected" : ""}`}
+    aria-pressed={selected}
+    onClick={onClick}
+    title={title}
+    type="button"
+  >
+    {children}
+  </button>
+);
+
+/* 🧩 Einfaches Bottom-Sheet (Info & Filter) */
+const BottomSheet: React.FC<{
+  open: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+  title?: string;
+}> = ({ open, onClose, children, title }) => {
+  if (!open) return null;
+  return (
+    <div
+      className="sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title || "Dialog"}
+    >
+      <div className="sheet__backdrop" onClick={onClose} />
+      <div className="sheet__panel">
+        <header className="sheet__header">
+          <strong>{title || "Information"}</strong>
+          <button
+            className="sheet__close"
+            onClick={onClose}
+            aria-label="Schließen"
+          >
+            ×
+          </button>
+        </header>
+        <div className="sheet__content">{children}</div>
+      </div>
+    </div>
+  );
+};
+
 export default function App() {
   // Welcome
   const [showWelcome, setShowWelcome] = useState(true);
@@ -31,12 +82,20 @@ export default function App() {
   // Suche/Filter
   const [search, setSearch] = useState("");
   const [kmMin, setKmMin] = useState(0);
-  const [kmMax, setKmMax] = useState(3000);
-  const [poiCategory, setPoiCategory] = useState("alle");
-  const [uferFilter, setUferFilter] = useState("beide");
-  const [sortOrder, setSortOrder] = useState("asc");
-  const [sortBy, setSortBy] = useState("km");
+  const [kmMax, setKmMax] = useState(2589);
+  const [poiCategory, setPoiCategory] = useState<
+    "alle" | "Schleuse" | "Tankstelle" | "Brücke" | "Überhebestelle"
+  >("alle");
+  const [uferFilter, setUferFilter] = useState<"beide" | "rechts" | "links">(
+    "beide"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [sortBy, setSortBy] = useState<"km" | "typ">("km");
   const [result, setResult] = useState<DonauPoint[]>([]);
+
+  // UI-State
+  const [showFilters, setShowFilters] = useState(false); // Filter‑Sheet
+  const [showInfo, setShowInfo] = useState(false); // Info‑Sheet
 
   // Init
   useEffect(() => {
@@ -53,7 +112,7 @@ export default function App() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Filtern/Sortieren
+  // Filtern/Sortieren (unverändert)
   const handleSearch = () => {
     const query = normalize(search.trim());
     const poiFilter = normalize(poiCategory);
@@ -61,7 +120,6 @@ export default function App() {
     const filtered = donauData.filter((entry) => {
       const inKmRange = entry.km >= kmMin && entry.km <= kmMax;
 
-      // Teilwort-Match (case-insensitive) auf beiden Ufern
       const matchesCategory =
         poiCategory === "alle" ||
         normalize(entry.rechts || "").includes(poiFilter) ||
@@ -93,7 +151,6 @@ export default function App() {
     });
 
     setResult(sorted);
-
     setTimeout(() => {
       document
         .getElementById("results")
@@ -109,91 +166,92 @@ export default function App() {
 
   return (
     <div className="App">
-      {/* Kopfbereich an „alte schwarze Version“ angelehnt */}
+      {/* Kopfbereich */}
       <header className="app-header">
         <div className="brand">
           <img src="/logo2.png" alt="BE & GREG SAILORS" className="app-logo" />
-          <h1 className="app-title">Stromkilometer-Suche</h1>
+          <h1 className="app-title">Danube Guide</h1>
         </div>
         <div className="app-actions">
-          <button onClick={() => setShowWelcome(true)}>ℹ️ Info</button>
+          <button onClick={() => setShowInfo(true)} aria-haspopup="dialog">
+            ℹ️ Info
+          </button>
           <ThemeSelector theme={theme} setTheme={setTheme} />
         </div>
       </header>
 
-      {/* Such- und Filterbedienung */}
+      {/* Suche */}
       <section className="controls">
         <div className="search-row">
           <input
-            placeholder="Stromkilometer oder Ortsname eingeben"
+            placeholder="Stromkilometer oder Teilwortsuche…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
-          <button className="primary" onClick={handleSearch}>
+          <button
+            className="primary"
+            onClick={handleSearch}
+            aria-label="Suchen"
+          >
             🔍 Suchen
           </button>
         </div>
 
-        <div className="filters">
-          <label>
-            KM von:
-            <input
-              type="number"
-              inputMode="numeric"
-              value={kmMin}
-              onChange={(e) => setKmMin(Number(e.target.value))}
-            />
-          </label>
-          <label>
-            bis:
-            <input
-              type="number"
-              inputMode="numeric"
-              value={kmMax}
-              onChange={(e) => setKmMax(Number(e.target.value))}
-            />
-          </label>
-          <label>
-            POI-Typ:
-            <select
-              value={poiCategory}
-              onChange={(e) => setPoiCategory(e.target.value)}
-            >
-              <option value="alle">Alle</option>
-              <option value="schleuse">Schleuse</option>
-              <option value="tankstelle">Tankstelle</option>
-              <option value="brücke">Brücke</option>
-            </select>
-          </label>
-          <label>
-            Ufer:
-            <select
-              value={uferFilter}
-              onChange={(e) => setUferFilter(e.target.value)}
-            >
-              <option value="beide">Beide Ufer</option>
-              <option value="rechts">Rechtes Donauufer</option>
-              <option value="links">Linkes Donauufer</option>
-            </select>
-          </label>
-          <label>
-            Sortierung:
-            <select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-            >
-              <option value="asc">↑ Aufsteigend</option>
-              <option value="desc">↓ Absteigend</option>
-            </select>
-          </label>
-          <label>
-            Sortieren nach:
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              <option value="km">Donau-Km</option>
-              <option value="typ">POI-Typ</option>
-            </select>
-          </label>
+        {/* Quick-Filters als Chips */}
+        <div className="quick-filters">
+          <Chip
+            selected={sortBy === "km"}
+            onClick={() => setSortBy("km")}
+            title="Nach Donau‑Km sortieren"
+          >
+            Donau‑Km
+          </Chip>
+          <Chip
+            selected={sortBy === "typ"}
+            onClick={() => setSortBy("typ")}
+            title="Nach POI‑Typ sortieren"
+          >
+            POI‑Typ
+          </Chip>
+
+          <Chip
+            selected={sortOrder === "asc"}
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+            title="Richtung umschalten"
+          >
+            {sortOrder === "asc" ? "↑" : "↓"}
+          </Chip>
+
+          <Chip
+            selected={uferFilter === "beide"}
+            onClick={() => setUferFilter("beide")}
+            title="Beide Ufer"
+          >
+            Beide
+          </Chip>
+          <Chip
+            selected={uferFilter === "links"}
+            onClick={() => setUferFilter("links")}
+            title="Linkes Ufer"
+          >
+            L
+          </Chip>
+          <Chip
+            selected={uferFilter === "rechts"}
+            onClick={() => setUferFilter("rechts")}
+            title="Rechtes Ufer"
+          >
+            R
+          </Chip>
+
+          <button
+            className="chip chip--ghost"
+            onClick={() => setShowFilters(true)}
+            aria-haspopup="dialog"
+          >
+            ⚙️ Filter…
+          </button>
         </div>
       </section>
 
@@ -201,7 +259,11 @@ export default function App() {
       <section id="results">
         {result.length > 0 ? (
           <div className="results">
-            <h2>📍 {result.length} Ergebnisse</h2>
+            <h2>
+              📍 {result.length} Ergebnisse · Sortiert:{" "}
+              {sortBy === "km" ? "Donau‑Km" : "POI‑Typ"}{" "}
+              {sortOrder === "asc" ? "↑" : "↓"}
+            </h2>
             {result.map((r, idx) => (
               <div key={idx} className="entry">
                 <div className="entry-row">
@@ -230,12 +292,112 @@ export default function App() {
         )}
       </section>
 
-      {/* Fixierter „Zurück zur Suche“-Button */}
+      {/* Sticky Bottom-Bar (ersetzt schwebenden Button) */}
       {result.length > 0 && (
-        <button className="scroll-top-button" onClick={scrollToTop}>
-          ⬆️ Zurück zur Suche
-        </button>
+        <div className="bottom-bar" role="toolbar">
+          <button className="bottom-bar__btn" onClick={scrollToTop}>
+            ⬆️ Nach oben
+          </button>
+          <button className="bottom-bar__fab" title="Neuen POI anlegen">
+            ＋
+          </button>
+        </div>
       )}
+
+      {/* Filter-Sheet */}
+      <BottomSheet
+        open={showFilters}
+        onClose={() => setShowFilters(false)}
+        title="Filter"
+      >
+        <div className="sheet__group">
+          <label className="label">KM‑Bereich</label>
+          <div className="range">
+            {/* Doppelslider: robust auf Mobile */}
+            <input
+              type="range"
+              min={0}
+              max={2589}
+              value={kmMin}
+              onChange={(e) =>
+                setKmMin(Math.min(Number(e.target.value), kmMax))
+              }
+            />
+            <input
+              type="range"
+              min={0}
+              max={2589}
+              value={kmMax}
+              onChange={(e) =>
+                setKmMax(Math.max(Number(e.target.value), kmMin))
+              }
+            />
+            <div className="range__values">
+              <span>{kmMin}</span>
+              <span>{kmMax}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="sheet__group">
+          <label className="label">POI‑Typ</label>
+          <div className="chip-row">
+            {(
+              [
+                "alle",
+                "Schleuse",
+                "Tankstelle",
+                "Brücke",
+                "Überhebestelle",
+              ] as const
+            ).map((k) => (
+              <Chip
+                key={k}
+                selected={poiCategory === k}
+                onClick={() => setPoiCategory(k)}
+              >
+                {k}
+              </Chip>
+            ))}
+          </div>
+        </div>
+
+        <div className="sheet__footer">
+          <button
+            className="btn-secondary"
+            onClick={() => {
+              setKmMin(0);
+              setKmMax(2589);
+              setPoiCategory("alle");
+              setUferFilter("beide");
+            }}
+          >
+            Zurücksetzen
+          </button>
+          <button
+            className="primary"
+            onClick={() => {
+              setShowFilters(false);
+              handleSearch();
+            }}
+          >
+            Filter übernehmen
+          </button>
+        </div>
+      </BottomSheet>
+
+      {/* Info-Sheet */}
+      <BottomSheet
+        open={showInfo}
+        onClose={() => setShowInfo(false)}
+        title="Neu in Release 2"
+      >
+        <ul className="info-list">
+          <li>WelcomePage neu gestaltet mit Emojis & Fettungen</li>
+          <li>Theme‑Selector: 🌙 Dark · 🌊 Ocean · 🏖️ Sand</li>
+          <li>Erweiterte POI‑Suche inkl. Teilwortsuche (case‑insensitive)</li>
+        </ul>
+      </BottomSheet>
     </div>
   );
 }
