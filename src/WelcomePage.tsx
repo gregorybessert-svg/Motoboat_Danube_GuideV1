@@ -27,7 +27,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onContinue }) => {
       <h1 className="welcome-title">Willkommen zur Donau Guide</h1>
 
       <p className="welcome-text">
-        🚤 Diese App liefert dir eine übersichtliche{" "}
+        📥 Diese App liefert dir eine übersichtliche{" "}
         <strong>Donau-Kilometrierung</strong> mit relevanten Punkten an beiden
         Ufern.
       </p>
