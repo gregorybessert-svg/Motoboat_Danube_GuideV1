@@ -15,36 +15,54 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onContinue }) => {
   };
 
   return (
-    <div className="welcome-container">
-      <div className="logo-header">
-        <img src="/logo2.png" alt="Donau Guide ab Untermühl" className="logo" />
-      </div>
+    <main className="welcome-container">
+      <header className="logo-header">
+        <img
+          src="/logo2.png"
+          alt="Donau Guide – Harbour Untermühl"
+          className="logo"
+        />
+      </header>
 
-      <h1 className="welcome-title">
-        Willkommen zur Donau Stromkilometer Guide ab Untermühl
-      </h1>
+      <h1 className="welcome-title">Willkommen zur Donau Guide</h1>
 
       <p className="welcome-text">
-        🚤 <strong>Willkommen an Bord!</strong>
-        Diese App wurde entwickelt, um Dir <strong>schnell</strong> und{" "}
-        <strong>unkompliziert</strong>
-        Informationen zu besonderen Punkten entlang der Donau bereitzustellen –
-        z. B. ⛴️ <strong>Schleusen</strong>, ⛽ <strong>Tankstellen</strong>, 🌉{" "}
-        <strong>Brücken</strong> oder 📍 <strong>markante Orte</strong>.
+        📥 Diese App liefert dir eine übersichtliche{" "}
+        <strong>Donau-Kilometrierung</strong> mit relevanten Punkten an beiden
+        Ufern.
+      </p>
+
+      <p className="welcome-text">Das findest du in der App:</p>
+      <ul className="feature-list">
+        <li>
+          ⛴️ <strong>Schleusen</strong> & Slipstellen (für 🛶 Wassersportler)
+        </li>
+        <li>
+          🧭 Donau-<strong>Fähren</strong> (praktisch für 🚲 🛴 Radfahrer)
+        </li>
+        <li>
+          ⛽ <strong>Tankstellen</strong> (für ⚓ Motorbootfahrer)
+        </li>
+        <li>
+          🌉 <strong>Brücken</strong> (nützlich für 🏛️ Behörden & 🚢
+          Schifffahrt)
+        </li>
+        <li>
+          📍 <strong>Sehenswürdigkeiten & markante Orte</strong> (für 🌍
+          Reisende & 🏖 Wanderer)
+        </li>
+      </ul>
+
+      <p className="welcome-text">
+        📏 <strong>Besonderheit:</strong> Die Kilometrierung ist zusätzlich
+        <em> ab unserem Heimathafen</em> 🏠 ➡️{" "}
+        <strong>Untermühl – KM 2167,8</strong> verfügbar.
       </p>
 
       <p className="welcome-text">
-        📏 <strong>Besonderheit:</strong>
-        Zusätzlich findest Du hier die Donau-Kilometrierung{" "}
-        <em>ab unserem Heimathafen</em> 🏠 ➡️{" "}
-        <strong>Untermühl – KM 2167,8</strong>
-      </p>
-
-      <p className="welcome-text">
-        🗂️ <strong>Alle Daten</strong> sind nach Donau-Kilometrierung geordnet
-        und ermöglichen eine gezielte Suche – ideal für ⚓{" "}
-        <strong>Wassersportler</strong>, 🧭 <strong>Skipper</strong>, 🏛️{" "}
-        <strong>Behörden</strong> oder neugierige 🌍 <strong>Reisende</strong>.
+        🗂️ Alle Einträge sind einem Donau-Kilometer zugeordnet und lassen sich
+        gezielt per <strong>Filter</strong> und <strong>Sortierung</strong>{" "}
+        finden.
       </p>
 
       <div className="welcome-checkbox">
@@ -54,12 +72,14 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onContinue }) => {
             checked={dontShowAgain}
             onChange={() => setDontShowAgain(!dontShowAgain)}
           />
-          &nbsp;Nicht mehr anzeigen
+          Nicht mehr anzeigen
         </label>
       </div>
 
-      <button onClick={handleStart}>Zur App</button>
-    </div>
+      <button className="welcome-cta" onClick={handleStart}>
+        Zur App
+      </button>
+    </main>
   );
 };
 
